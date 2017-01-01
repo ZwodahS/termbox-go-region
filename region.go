@@ -37,6 +37,7 @@ type Region struct {
 	height   int              // height of the region
 	position XY               // x, y
 	parent   *Region          // parent region
+	dirty    bool             // bool marking if this region is dirty
 }
 
 // Create a new region
@@ -50,6 +51,7 @@ func NewRegion(width, height int, defaultCell termbox.Cell) *Region {
 		}
 	}
 	region.regions = make([]*Region, 0)
+	region.dirty = true
 	return region
 }
 
@@ -58,6 +60,7 @@ func (r *Region) NewRegion(width, height int, defaultCell termbox.Cell) *Region 
 	region := NewRegion(width, height, defaultCell)
 	region.parent = r
 	r.regions = append(r.regions, region)
+	r.dirty = true
 	return region
 }
 
@@ -104,25 +107,31 @@ func (r *Region) Draw(params ...int) {
 	startX := x + r.position[0]
 	startY := y + r.position[1]
 
-	for rX := 0; rX < r.width; rX++ {
-		actualX := startX + rX
-		// hide the cell if out of the bound
-		if width != -1 && (actualX < actualMinX || actualX > actualMaxX) {
-			continue
-		}
-		for rY := 0; rY < r.height; rY++ {
-			actualY := startY + rY
+	if r.dirty {
+		for rX := 0; rX < r.width; rX++ {
+			actualX := startX + rX
 			// hide the cell if out of the bound
-			if width != -1 && (actualY < actualMinY || actualY > actualMaxY) {
+			if width != -1 && (actualX < actualMinX || actualX > actualMaxX) {
 				continue
 			}
-			termbox.SetCell(actualX, actualY, r.Cells[rX][rY].Ch, r.Cells[rX][rY].Fg, r.Cells[rX][rY].Bg)
+			for rY := 0; rY < r.height; rY++ {
+				actualY := startY + rY
+				// hide the cell if out of the bound
+				if width != -1 && (actualY < actualMinY || actualY > actualMaxY) {
+					continue
+				}
+				termbox.SetCell(actualX, actualY, r.Cells[rX][rY].Ch, r.Cells[rX][rY].Fg, r.Cells[rX][rY].Bg)
+			}
 		}
 	}
 	// draw the child regions
 	for _, region := range r.regions {
+		if r.dirty { // if parent is dirty, we need to force all child to redraw
+			region.dirty = true
+		}
 		region.Draw(startX, startY, r.width, r.height)
 	}
+	r.dirty = false
 }
 
 // Draw a thin border in this region
@@ -144,6 +153,10 @@ func (r *Region) GetPosition() XY {
 // Setting position of this region with respect to parent.
 func (r *Region) SetPosition(xy XY) {
 	r.position = xy
+	r.dirty = true
+	if r.parent != nil {
+		r.parent.dirty = true
+	}
 }
 
 // Check if a position is out of bound.
@@ -163,6 +176,7 @@ func (r *Region) SetCell(x, y int, ru rune, fg, bg termbox.Attribute) {
 		return
 	}
 	r.Cells[x][y] = termbox.Cell{Ch: ru, Fg: fg, Bg: bg}
+	r.dirty = true
 }
 
 // Set the rune value at this position.
@@ -171,6 +185,7 @@ func (r *Region) SetRune(x, y int, ru rune) {
 		return
 	}
 	r.Cells[x][y].Ch = ru
+	r.dirty = true
 }
 
 // Set the foreground value at this position.
@@ -179,6 +194,7 @@ func (r *Region) SetForeground(x, y int, fg termbox.Attribute) {
 		return
 	}
 	r.Cells[x][y].Fg = fg
+	r.dirty = true
 }
 
 // Set the background value at this position.
@@ -187,6 +203,7 @@ func (r *Region) SetBackground(x, y int, bg termbox.Attribute) {
 		return
 	}
 	r.Cells[x][y].Bg = bg
+	r.dirty = true
 }
 
 // Fill the region with data
@@ -196,13 +213,5 @@ func (r *Region) Fill(ru rune, fg, bg termbox.Attribute) {
 			r.Cells[x][y] = termbox.Cell{Ch: ru, Fg: fg, Bg: bg}
 		}
 	}
-}
-
-// Get the cell that is in this position.
-// Returns actual reference to the cell, which can be modified directly.
-func (r *Region) GetCell(x, y int) *termbox.Cell {
-	if r.IsOutOfBound(x, y) {
-		return nil
-	}
-	return &r.Cells[x][y]
+	r.dirty = true
 }
