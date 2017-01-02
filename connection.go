@@ -53,7 +53,7 @@ type Borderable interface {
 
 func DrawThinBorder(borderable Borderable) {
 	size := borderable.GetSize()
-	left, right, top, bottom := 0, size[0]-1, 0, size[1]-1
+	left, right, top, bottom := 0, size.X-1, 0, size.Y-1
 	if left == right || top == bottom {
 		return
 	}
@@ -61,10 +61,10 @@ func DrawThinBorder(borderable Borderable) {
 	borderable.SetRune(right, top, GetThinConnection(false, false, true, true))
 	borderable.SetRune(left, bottom, GetThinConnection(true, true, false, false))
 	borderable.SetRune(right, bottom, GetThinConnection(true, false, false, true))
-	DrawHLine(left+1, top, size[0]-2, borderable)
-	DrawHLine(left+1, bottom, size[0]-2, borderable)
-	DrawVLine(left, top+1, size[1]-2, borderable)
-	DrawVLine(right, top+1, size[1]-2, borderable)
+	DrawHLine(left+1, top, size.X-2, borderable)
+	DrawHLine(left+1, bottom, size.X-2, borderable)
+	DrawVLine(left, top+1, size.Y-2, borderable)
+	DrawVLine(right, top+1, size.Y-2, borderable)
 }
 
 func getConnection(connections [][]bool, x, y int) bool {
@@ -96,12 +96,12 @@ func DrawConnections(borderable Borderable, x, y int, connections [][]bool) {
 	lines := GetConnections(borderable, connections)
 	for lY, _ := range lines {
 		actualY := lY + y
-		if actualY < 0 || actualY >= size.Y() {
+		if actualY < 0 || actualY >= size.Y {
 			continue
 		}
 		for lX, _ := range lines[lY] {
 			actualX := lX + x
-			if actualX < 0 || actualX >= size.X() {
+			if actualX < 0 || actualX >= size.X {
 				continue
 			}
 			if connections[lY][lX] {

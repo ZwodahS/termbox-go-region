@@ -5,24 +5,20 @@ import (
 	termbox "github.com/nsf/termbox-go"
 )
 
-type XY [2]int
-
-func (xy XY) X() int {
-	return xy[0]
-}
-func (xy XY) Y() int {
-	return xy[1]
+type XY struct {
+	X int
+	Y int
 }
 
 func (xy XY) Set(x, y int) XY {
-	xy[0] = x
-	xy[1] = y
+	xy.X = x
+	xy.Y = y
 	return xy
 }
 
 func (xy XY) Add(x, y int) XY {
-	xy[0] += x
-	xy[1] += y
+	xy.X += x
+	xy.Y += y
 	return xy
 }
 
@@ -39,7 +35,7 @@ type Region struct {
 
 // Create a new region
 func NewRegion(width, height int, defaultCell termbox.Cell) *Region {
-	region := &Region{width: width, height: height, position: [2]int{0, 0}, parent: nil}
+	region := &Region{width: width, height: height, position: XY{X: 0, Y: 0}, parent: nil}
 	region.Cells = make([][]termbox.Cell, height)
 	for y := 0; y < height; y++ {
 		region.Cells[y] = make([]termbox.Cell, width)
@@ -101,8 +97,8 @@ func (r *Region) Draw(params ...int) {
 	}
 
 	// the actual starts to this region
-	startX := x + r.position[0]
-	startY := y + r.position[1]
+	startX := x + r.position.X
+	startY := y + r.position.Y
 
 	if r.dirty {
 		for rY := range r.Cells {
