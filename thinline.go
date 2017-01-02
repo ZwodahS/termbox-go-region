@@ -37,7 +37,7 @@ func GetThinLine(top, right, bottom, left bool) rune {
 	return thin[intValue]
 }
 
-func InitBorder() {
+func initThinLines() {
 	thin = [...]rune{
 		Thin_0000, Thin_0001, Thin_0010, Thin_0011,
 		Thin_0100, Thin_0101, Thin_0110, Thin_0111,

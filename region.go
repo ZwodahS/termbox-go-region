@@ -226,3 +226,8 @@ func (r *Region) Fill(ru rune, fg, bg termbox.Attribute) {
 	}
 	r.dirty = true
 }
+
+func InitRegion() error {
+	initThinLines()
+	return nil
+}

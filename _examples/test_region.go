@@ -12,7 +12,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	tbregion.InitBorder()
+	tbregion.InitRegion()
 	defer termbox.Close()
 
 	events := make(chan termbox.Event)
