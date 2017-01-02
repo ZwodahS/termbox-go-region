@@ -1,6 +1,7 @@
 package tbregion
 
 import (
+	runewidth "github.com/mattn/go-runewidth"
 	termbox "github.com/nsf/termbox-go"
 )
 
@@ -175,6 +176,14 @@ func (r *Region) SetCell(x, y int, ru rune, fg, bg termbox.Attribute) {
 	}
 	r.Cells[y][x] = termbox.Cell{Ch: ru, Fg: fg, Bg: bg}
 	r.dirty = true
+}
+
+func (r *Region) SetText(x, y int, str string, fg, bg termbox.Attribute) {
+	drawX := x
+	for _, value := range str {
+		r.SetCell(drawX, y, value, fg, bg)
+		drawX += runewidth.RuneWidth(value)
+	}
 }
 
 // Set the rune value at this position.
