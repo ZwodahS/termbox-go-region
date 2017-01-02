@@ -20,7 +20,7 @@ const Thin_1000 = ' '
 
 var thin [16]rune
 
-func GetThinConnection(top, right, bottom, left bool) rune {
+func GetThinLine(top, right, bottom, left bool) rune {
 	intValue := 0
 	if top {
 		intValue += 8
@@ -57,43 +57,43 @@ func DrawThinBorder(borderable Borderable) {
 	if left == right || top == bottom {
 		return
 	}
-	borderable.SetRune(left, top, GetThinConnection(false, true, true, false))
-	borderable.SetRune(right, top, GetThinConnection(false, false, true, true))
-	borderable.SetRune(left, bottom, GetThinConnection(true, true, false, false))
-	borderable.SetRune(right, bottom, GetThinConnection(true, false, false, true))
-	DrawHLine(left+1, top, size.X-2, borderable)
-	DrawHLine(left+1, bottom, size.X-2, borderable)
-	DrawVLine(left, top+1, size.Y-2, borderable)
-	DrawVLine(right, top+1, size.Y-2, borderable)
+	borderable.SetRune(left, top, GetThinLine(false, true, true, false))
+	borderable.SetRune(right, top, GetThinLine(false, false, true, true))
+	borderable.SetRune(left, bottom, GetThinLine(true, true, false, false))
+	borderable.SetRune(right, bottom, GetThinLine(true, false, false, true))
+	DrawHThinLine(left+1, top, size.X-2, borderable)
+	DrawHThinLine(left+1, bottom, size.X-2, borderable)
+	DrawVThinLine(left, top+1, size.Y-2, borderable)
+	DrawVThinLine(right, top+1, size.Y-2, borderable)
 }
 
-func getConnection(connections [][]bool, x, y int) bool {
+func getLine(connections [][]bool, x, y int) bool {
 	if y < 0 || y >= len(connections) || x < 0 || x >= len(connections[y]) {
 		return false
 	}
 	return connections[y][x]
 }
 
-// Draw Connection based on a [][]bool, starting from x, y
-func GetConnections(borderable Borderable, connections [][]bool) [][]rune {
+// Draw Line based on a [][]bool, starting from x, y
+func GetThinLines(borderable Borderable, connections [][]bool) [][]rune {
 	lines := make([][]rune, len(connections))
 	for bY := 0; bY < len(connections); bY++ {
 		lines[bY] = make([]rune, len(connections[bY]))
 		for bX := 0; bX < len(connections[bY]); bX++ {
-			lines[bY][bX] = GetThinConnection(
-				getConnection(connections, bX, bY-1),
-				getConnection(connections, bX+1, bY),
-				getConnection(connections, bX, bY+1),
-				getConnection(connections, bX-1, bY),
+			lines[bY][bX] = GetThinLine(
+				getLine(connections, bX, bY-1),
+				getLine(connections, bX+1, bY),
+				getLine(connections, bX, bY+1),
+				getLine(connections, bX-1, bY),
 			)
 		}
 	}
 	return lines
 }
 
-func DrawConnections(borderable Borderable, x, y int, connections [][]bool) {
+func DrawThinLines(borderable Borderable, x, y int, connections [][]bool) {
 	size := borderable.GetSize()
-	lines := GetConnections(borderable, connections)
+	lines := GetThinLines(borderable, connections)
 	for lY, _ := range lines {
 		actualY := lY + y
 		if actualY < 0 || actualY >= size.Y {
@@ -111,21 +111,21 @@ func DrawConnections(borderable Borderable, x, y int, connections [][]bool) {
 	}
 }
 
-func DrawHLine(startX, startY, length int, borderable Borderable) {
+func DrawHThinLine(startX, startY, length int, borderable Borderable) {
 	if length < 0 {
 		return
 	}
-	ru := GetThinConnection(false, true, false, true)
+	ru := GetThinLine(false, true, false, true)
 	for x := startX; x < startX+length; x++ {
 		borderable.SetRune(x, startY, ru)
 	}
 }
 
-func DrawVLine(startX, startY, length int, borderable Borderable) {
+func DrawVThinLine(startX, startY, length int, borderable Borderable) {
 	if length < 0 {
 		return
 	}
-	ru := GetThinConnection(true, false, true, false)
+	ru := GetThinLine(true, false, true, false)
 	for y := startY; y < startY+length; y++ {
 		borderable.SetRune(startX, y, ru)
 	}
