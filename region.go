@@ -166,18 +166,26 @@ func (r *Region) IsOutOfBound(x, y int) bool {
 }
 
 // Set the cell value at this position.
-func (r *Region) SetCell(x, y int, ru rune, fg, bg termbox.Attribute) {
+// first attribute is foreground, second attribute is background
+func (r *Region) SetCell(x, y int, ru rune, attributes ...termbox.Attribute) {
 	if r.IsOutOfBound(x, y) {
 		return
 	}
-	r.Cells[y][x] = termbox.Cell{Ch: ru, Fg: fg, Bg: bg}
+	r.Cells[y][x].Ch = ru
+	if len(attributes) >= 2 {
+		r.Cells[y][x].Fg = attributes[0]
+		r.Cells[y][x].Bg = attributes[1]
+	} else if len(attributes) == 1 {
+		r.Cells[y][x].Fg = attributes[0]
+	}
 	r.dirty = true
 }
 
-func (r *Region) SetText(x, y int, str string, fg, bg termbox.Attribute) {
+// first attribute is foreground, second attribute is background
+func (r *Region) SetText(x, y int, str string, attributes ...termbox.Attribute) {
 	drawX := x
 	for _, value := range str {
-		r.SetCell(drawX, y, value, fg, bg)
+		r.SetCell(drawX, y, value, attributes...)
 		drawX += runewidth.RuneWidth(value)
 	}
 }

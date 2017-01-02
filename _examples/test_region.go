@@ -41,8 +41,15 @@ func main() {
 	region2 := region1.NewRegion(10, 5, termbox.Cell{Ch: ' ', Fg: termbox.ColorDefault, Bg: termbox.ColorBlue})
 	region2.DrawThinBorder()
 
-	region3 := mainRegion.NewRegion(50, 2, termbox.Cell{Ch: ' ', Fg: termbox.ColorDefault, Bg: termbox.ColorDefault})
+	region3 := mainRegion.NewRegion(50, 2, termbox.Cell{Ch: ' ', Fg: termbox.ColorRed, Bg: termbox.ColorBlue})
 	region3.SetText(0, 0, "This is a testing text", termbox.ColorDefault, termbox.ColorDefault)
+	region3.SetPosition(tbregion.XY{X: 0, Y: 20})
+	region4 := mainRegion.NewRegion(50, 2, termbox.Cell{Ch: ' ', Fg: termbox.ColorRed, Bg: termbox.ColorBlue})
+	region4.SetText(0, 0, "This is a testing text", termbox.ColorDefault)
+	region4.SetPosition(tbregion.XY{X: 0, Y: 24})
+	region5 := mainRegion.NewRegion(50, 2, termbox.Cell{Ch: ' ', Fg: termbox.ColorRed, Bg: termbox.ColorBlue})
+	region5.SetText(0, 0, "This is a testing text")
+	region5.SetPosition(tbregion.XY{X: 0, Y: 28})
 
 	selectedRegion := &region1
 
@@ -73,6 +80,10 @@ loop:
 						selectedRegion = &region2
 					case '3':
 						selectedRegion = &region3
+					case '4':
+						selectedRegion = &region4
+					case '5':
+						selectedRegion = &region5
 					}
 				}
 			}
