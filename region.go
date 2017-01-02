@@ -6,11 +6,23 @@ import (
 
 type XY [2]int
 
-func (xy *XY) X() int {
+func (xy XY) X() int {
 	return xy[0]
 }
-func (xy *XY) Y() int {
+func (xy XY) Y() int {
 	return xy[1]
+}
+
+func (xy XY) Set(x, y int) XY {
+	xy[0] = x
+	xy[1] = y
+	return xy
+}
+
+func (xy XY) Add(x, y int) XY {
+	xy[0] += x
+	xy[1] += y
+	return xy
 }
 
 type Region struct {
