@@ -35,11 +35,14 @@ func main() {
 
 	mainRegion := tbregion.NewRegion(100, 100, termbox.Cell{Ch: ' ', Fg: termbox.ColorDefault, Bg: termbox.ColorDefault})
 
-	region1 := mainRegion.NewRegion(10, 10, termbox.Cell{Ch: ' ', Fg: termbox.ColorDefault, Bg: termbox.ColorRed})
+	region1 := mainRegion.NewRegion(20, 10, termbox.Cell{Ch: ' ', Fg: termbox.ColorDefault, Bg: termbox.ColorRed})
 	region1.DrawThinBorder()
 
-	region2 := region1.NewRegion(5, 5, termbox.Cell{Ch: ' ', Fg: termbox.ColorDefault, Bg: termbox.ColorBlue})
+	region2 := region1.NewRegion(10, 5, termbox.Cell{Ch: ' ', Fg: termbox.ColorDefault, Bg: termbox.ColorBlue})
 	region2.DrawThinBorder()
+
+	region3 := mainRegion.NewRegion(50, 2, termbox.Cell{Ch: ' ', Fg: termbox.ColorDefault, Bg: termbox.ColorDefault})
+	region3.SetText(0, 0, "This is a testing text", termbox.ColorDefault, termbox.ColorDefault)
 
 	selectedRegion := &region1
 
@@ -68,6 +71,8 @@ loop:
 						selectedRegion = &region1
 					case '2':
 						selectedRegion = &region2
+					case '3':
+						selectedRegion = &region3
 					}
 				}
 			}
