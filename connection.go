@@ -47,7 +47,7 @@ func InitBorder() {
 }
 
 type Borderable interface {
-	GetSize() [2]int
+	GetSize() XY
 	SetRune(x, y int, ru rune)
 }
 
@@ -68,19 +68,19 @@ func DrawThinBorder(borderable Borderable) {
 }
 
 func getConnection(connections [][]bool, x, y int) bool {
-	if x < 0 || x >= len(connections) || y < 0 || y >= len(connections[x]) {
+	if y < 0 || y >= len(connections) || x < 0 || x >= len(connections[y]) {
 		return false
 	}
-	return connections[x][y]
+	return connections[y][x]
 }
 
 // Draw Connection based on a [][]bool, starting from x, y
 func GetConnections(borderable Borderable, connections [][]bool) [][]rune {
 	lines := make([][]rune, len(connections))
-	for bX := 0; bX < len(connections); bX++ {
-		lines[bX] = make([]rune, len(connections[bX]))
-		for bY := 0; bY < len(connections[bX]); bY++ {
-			lines[bX][bY] = GetThinConnection(
+	for bY := 0; bY < len(connections); bY++ {
+		lines[bY] = make([]rune, len(connections[bY]))
+		for bX := 0; bX < len(connections[bY]); bX++ {
+			lines[bY][bX] = GetThinConnection(
 				getConnection(connections, bX, bY-1),
 				getConnection(connections, bX+1, bY),
 				getConnection(connections, bX, bY+1),
@@ -94,18 +94,18 @@ func GetConnections(borderable Borderable, connections [][]bool) [][]rune {
 func DrawConnections(borderable Borderable, x, y int, connections [][]bool) {
 	size := borderable.GetSize()
 	lines := GetConnections(borderable, connections)
-	for lX := 0; lX < len(lines); lX++ {
-		actualX := lX + x
-		if actualX < 0 || actualX >= size[0] {
+	for lY, _ := range lines {
+		actualY := lY + y
+		if actualY < 0 || actualY >= size.Y() {
 			continue
 		}
-		for lY := 0; lY < len(lines[lX]); lY++ {
-			actualY := lY + y
-			if actualY < 0 || actualY >= size[1] {
+		for lX, _ := range lines[lY] {
+			actualX := lX + x
+			if actualX < 0 || actualX >= size.X() {
 				continue
 			}
-			if connections[lX][lY] {
-				borderable.SetRune(actualX, actualY, lines[lX][lY])
+			if connections[lY][lX] {
+				borderable.SetRune(actualX, actualY, lines[lY][lX])
 			}
 		}
 	}
