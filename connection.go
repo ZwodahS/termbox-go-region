@@ -1,26 +1,3 @@
-/**
-MIT License
-
-Copyright (c) 2017 ZwodahS
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
 package tbregion
 
 // TOP RIGHT BOTTOM LEFT
@@ -88,6 +65,50 @@ func DrawThinBorder(borderable Borderable) {
 	DrawHLine(left+1, bottom, size[0]-2, borderable)
 	DrawVLine(left, top+1, size[1]-2, borderable)
 	DrawVLine(right, top+1, size[1]-2, borderable)
+}
+
+func getConnection(connections [][]bool, x, y int) bool {
+	if x < 0 || x >= len(connections) || y < 0 || y >= len(connections[x]) {
+		return false
+	}
+	return connections[x][y]
+}
+
+// Draw Connection based on a [][]bool, starting from x, y
+func GetConnections(borderable Borderable, connections [][]bool) [][]rune {
+	lines := make([][]rune, len(connections))
+	for bX := 0; bX < len(connections); bX++ {
+		lines[bX] = make([]rune, len(connections[bX]))
+		for bY := 0; bY < len(connections[bX]); bY++ {
+			lines[bX][bY] = GetThinConnection(
+				getConnection(connections, bX, bY-1),
+				getConnection(connections, bX+1, bY),
+				getConnection(connections, bX, bY+1),
+				getConnection(connections, bX-1, bY),
+			)
+		}
+	}
+	return lines
+}
+
+func DrawConnections(borderable Borderable, x, y int, connections [][]bool) {
+	size := borderable.GetSize()
+	lines := GetConnections(borderable, connections)
+	for lX := 0; lX < len(lines); lX++ {
+		actualX := lX + x
+		if actualX < 0 || actualX >= size[0] {
+			continue
+		}
+		for lY := 0; lY < len(lines[lX]); lY++ {
+			actualY := lY + y
+			if actualY < 0 || actualY >= size[1] {
+				continue
+			}
+			if connections[lX][lY] {
+				borderable.SetRune(actualX, actualY, lines[lX][lY])
+			}
+		}
+	}
 }
 
 func DrawHLine(startX, startY, length int, borderable Borderable) {
