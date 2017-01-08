@@ -194,6 +194,15 @@ func (r *Region) SetText(x, y int, str string, attributes ...termbox.Attribute) 
 	}
 }
 
+func (r *Region) SetTextCenter(y int, str string, attributes ...termbox.Attribute) {
+	// calculate the start point to draw
+	drawX := r.width/2 - runewidth.StringWidth(str)/2
+	for _, value := range str {
+		r.SetCell(drawX, y, value, attributes...)
+		drawX += runewidth.RuneWidth(value)
+	}
+}
+
 // Set the rune value at this position.
 func (r *Region) SetRune(x, y int, ru rune) {
 	if r.IsOutOfBound(x, y) {
