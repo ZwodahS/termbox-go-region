@@ -34,9 +34,13 @@ type Region struct {
 }
 
 // Create a new region
-func NewRegion(width, height int, defaultCell termbox.Cell) *Region {
+func NewRegion(width, height int, cells ...termbox.Cell) *Region {
 	region := &Region{width: width, height: height, position: XY{X: 0, Y: 0}, parent: nil}
 	region.Cells = make([][]termbox.Cell, height)
+	defaultCell := termbox.Cell{Ch: ' ', Fg: termbox.ColorWhite, Bg: termbox.ColorBlack}
+	if len(cells) > 0 {
+		defaultCell = cells[0]
+	}
 	for y := 0; y < height; y++ {
 		region.Cells[y] = make([]termbox.Cell, width)
 		for x := 0; x < width; x++ {
@@ -49,8 +53,8 @@ func NewRegion(width, height int, defaultCell termbox.Cell) *Region {
 }
 
 // Create a new region inside region
-func (r *Region) NewRegion(width, height int, defaultCell termbox.Cell) *Region {
-	region := NewRegion(width, height, defaultCell)
+func (r *Region) NewRegion(width, height int, cells ...termbox.Cell) *Region {
+	region := NewRegion(width, height, cells...)
 	region.parent = r
 	r.regions = append(r.regions, region)
 	r.dirty = true
@@ -218,10 +222,10 @@ func (r *Region) SetBackground(x, y int, bg termbox.Attribute) {
 }
 
 // Fill the region with data
-func (r *Region) Fill(ru rune, fg, bg termbox.Attribute) {
+func (r *Region) Fill(ru rune, attributes ...termbox.Attribute) {
 	for x := 0; x < r.width; x++ {
 		for y := 0; y < r.height; y++ {
-			r.Cells[y][x] = termbox.Cell{Ch: ru, Fg: fg, Bg: bg}
+			r.SetCell(x, y, ru, attributes...)
 		}
 	}
 	r.dirty = true
