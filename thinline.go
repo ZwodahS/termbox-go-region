@@ -1,25 +1,28 @@
 package tbregion
 
-// TOP RIGHT BOTTOM LEFT
-const Thin_0011 = '┐'
-const Thin_1001 = '┘'
-const Thin_0110 = '┌'
-const Thin_1100 = '└'
-const Thin_1111 = '┼'
-const Thin_0101 = '─'
-const Thin_1110 = '├'
-const Thin_1011 = '┤'
-const Thin_1101 = '┴'
-const Thin_0111 = '┬'
-const Thin_1010 = '│'
-const Thin_0000 = ' '
-const Thin_0001 = ' '
-const Thin_0010 = ' '
-const Thin_0100 = ' '
-const Thin_1000 = ' '
+// Thin (TOP RIGHT BOTTOM LEFT)
+const (
+	Thin0011 = '┐'
+	Thin1001 = '┘'
+	Thin0110 = '┌'
+	Thin1100 = '└'
+	Thin1111 = '┼'
+	Thin0101 = '─'
+	Thin1110 = '├'
+	Thin1011 = '┤'
+	Thin1101 = '┴'
+	Thin0111 = '┬'
+	Thin1010 = '│'
+	Thin0000 = ' '
+	Thin0001 = ' '
+	Thin0010 = ' '
+	Thin0100 = ' '
+	Thin1000 = ' '
+)
 
 var thin [16]rune
 
+// GetThinLine get the correct thin border to draw based on if top, right, bottom, left has connections
 func GetThinLine(top, right, bottom, left bool) rune {
 	intValue := 0
 	if top {
@@ -39,18 +42,20 @@ func GetThinLine(top, right, bottom, left bool) rune {
 
 func initThinLines() {
 	thin = [...]rune{
-		Thin_0000, Thin_0001, Thin_0010, Thin_0011,
-		Thin_0100, Thin_0101, Thin_0110, Thin_0111,
-		Thin_1000, Thin_1001, Thin_1010, Thin_1011,
-		Thin_1100, Thin_1101, Thin_1110, Thin_1111,
+		Thin0000, Thin0001, Thin0010, Thin0011,
+		Thin0100, Thin0101, Thin0110, Thin0111,
+		Thin1000, Thin1001, Thin1010, Thin1011,
+		Thin1100, Thin1101, Thin1110, Thin1111,
 	}
 }
 
+//Borderable is interface that can border can be drawn on it
 type Borderable interface {
 	GetSize() XY
 	SetRune(x, y int, ru rune)
 }
 
+//DrawThinBorder draws thin border around the borderable
 func DrawThinBorder(borderable Borderable) {
 	size := borderable.GetSize()
 	left, right, top, bottom := 0, size.X-1, 0, size.Y-1
@@ -74,8 +79,8 @@ func getLine(connections [][]bool, x, y int) bool {
 	return connections[y][x]
 }
 
-// Draw Line based on a [][]bool, starting from x, y
-func GetThinLines(borderable Borderable, connections [][]bool) [][]rune {
+// GetThinLines returns the runes to be draw given the connections
+func GetThinLines(connections [][]bool) [][]rune {
 	lines := make([][]rune, len(connections))
 	for bY := 0; bY < len(connections); bY++ {
 		lines[bY] = make([]rune, len(connections[bY]))
@@ -91,15 +96,16 @@ func GetThinLines(borderable Borderable, connections [][]bool) [][]rune {
 	return lines
 }
 
+// DrawThinLines onto a borderable based on a connections starting from x, y
 func DrawThinLines(borderable Borderable, x, y int, connections [][]bool) {
 	size := borderable.GetSize()
-	lines := GetThinLines(borderable, connections)
-	for lY, _ := range lines {
+	lines := GetThinLines(connections)
+	for lY := range lines {
 		actualY := lY + y
 		if actualY < 0 || actualY >= size.Y {
 			continue
 		}
-		for lX, _ := range lines[lY] {
+		for lX := range lines[lY] {
 			actualX := lX + x
 			if actualX < 0 || actualX >= size.X {
 				continue
@@ -111,6 +117,7 @@ func DrawThinLines(borderable Borderable, x, y int, connections [][]bool) {
 	}
 }
 
+// DrawHThinLine draws a horizontal line starting from startX, startY with a specific length
 func DrawHThinLine(startX, startY, length int, borderable Borderable) {
 	if length < 0 {
 		return
@@ -121,6 +128,7 @@ func DrawHThinLine(startX, startY, length int, borderable Borderable) {
 	}
 }
 
+// DrawVThinLine draws a vertical line starting from startX, startY with a specific length
 func DrawVThinLine(startX, startY, length int, borderable Borderable) {
 	if length < 0 {
 		return
