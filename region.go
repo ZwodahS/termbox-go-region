@@ -61,6 +61,43 @@ func (r *Region) NewRegion(width, height int, cells ...termbox.Cell) *Region {
 	return region
 }
 
+func (r *Region) RemoveRegion(region *Region) bool {
+	index := r.GetRegionIndex(region)
+	if index == -1 {
+		return false
+	}
+	// Do we need to optimize ?
+	r.regions = append(r.regions[:index], r.regions[index+1:]...)
+	return true
+}
+
+func (r *Region) RemoveAllRegions(region *Region) {
+	r.regions = make([]*Region, 0)
+}
+
+func (r *Region) Close() {
+	if r.parent == nil {
+		return
+	}
+	r.parent.RemoveRegion(r)
+	// any clean up ?
+}
+
+// Get the position of region in region
+// return -1 if not found
+func (r *Region) GetRegionIndex(region *Region) int {
+	for ind, value := range r.regions {
+		if value == region {
+			return ind
+		}
+	}
+	return -1
+}
+
+func (r *Region) MarkForRedraw() {
+	r.dirty = true
+}
+
 // Draw the cells in the region onto the termbox buffer.
 // This will call the Draw method in all the child regions.
 // Takes 4 arguments, x, y, width, height
