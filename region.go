@@ -187,8 +187,8 @@ func (r *Region) GetPosition() XY {
 }
 
 // Setting position of this region with respect to parent.
-func (r *Region) SetPosition(xy XY) {
-	r.position = xy
+func (r *Region) SetPosition(x, y int) {
+	r.position = XY{X: x, Y: y}
 	r.dirty = true
 	if r.parent != nil {
 		r.parent.dirty = true
