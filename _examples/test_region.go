@@ -43,13 +43,13 @@ func main() {
 
 	region3 := mainRegion.NewRegion(50, 2, termbox.Cell{Ch: ' ', Fg: termbox.ColorRed, Bg: termbox.ColorBlue})
 	region3.SetText(0, 0, "This is a testing text", termbox.ColorDefault, termbox.ColorDefault)
-	region3.SetPosition(tbregion.XY{X: 0, Y: 20})
+	region3.SetPosition(0, 20)
 	region4 := mainRegion.NewRegion(50, 2, termbox.Cell{Ch: ' ', Fg: termbox.ColorRed, Bg: termbox.ColorBlue})
 	region4.SetText(0, 0, "This is a testing text", termbox.ColorDefault)
-	region4.SetPosition(tbregion.XY{X: 0, Y: 24})
+	region4.SetPosition(0, 24)
 	region5 := mainRegion.NewRegion(50, 2, termbox.Cell{Ch: ' ', Fg: termbox.ColorRed, Bg: termbox.ColorBlue})
 	region5.SetText(0, 0, "This is a testing text")
-	region5.SetPosition(tbregion.XY{X: 0, Y: 28})
+	region5.SetPosition(0, 28)
 
 	selectedRegion := &region1
 
@@ -63,13 +63,21 @@ loop:
 				case termbox.KeyEsc:
 					break loop
 				case termbox.KeyArrowDown:
-					(*selectedRegion).SetPosition((*selectedRegion).GetPosition().Add(0, 1))
+					position := (*selectedRegion).GetPosition()
+					position.Add(0, 1)
+					(*selectedRegion).SetPosition(position.X, position.Y)
 				case termbox.KeyArrowUp:
-					(*selectedRegion).SetPosition((*selectedRegion).GetPosition().Add(0, -1))
+					position := (*selectedRegion).GetPosition()
+					position.Add(0, -1)
+					(*selectedRegion).SetPosition(position.X, position.Y)
 				case termbox.KeyArrowLeft:
-					(*selectedRegion).SetPosition((*selectedRegion).GetPosition().Add(-1, 0))
+					position := (*selectedRegion).GetPosition()
+					position.Add(-1, 0)
+					(*selectedRegion).SetPosition(position.X, position.Y)
 				case termbox.KeyArrowRight:
-					(*selectedRegion).SetPosition((*selectedRegion).GetPosition().Add(1, 0))
+					position := (*selectedRegion).GetPosition()
+					position.Add(1, 0)
+					(*selectedRegion).SetPosition(position.X, position.Y)
 				default:
 					switch e.Ch {
 					case 'h':
